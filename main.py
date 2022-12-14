@@ -217,12 +217,12 @@ def help(update: Update, context: CallbackContext):
 
 def unknown_text(update: Update, context: CallbackContext):
     update.message.reply_text(
-        "Sorry I can't recognize you , you said '%s'" % update.message.text)
+        "Oops, our bot doesn't understand what '%s' means" % update.message.text)
 
 
 def unknown(update: Update, context: CallbackContext):
     update.message.reply_text(
-        "Sorry '%s' is not a valid command" % update.message.text)
+        "Oops '%s' is not a valid command" % update.message.text)
 
 
 def main() -> None:
