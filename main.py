@@ -39,7 +39,7 @@ def is_subscribed(slack_id):
     return telegram chat id
     """
 
-    connection = create_db_connection(host, user, password, database)
+    connection = create_db_connection(host, user, password, database) 
     cursor = connection.cursor()
 
     cursor.execute(f'SELECT chat_id FROM Profile WHERE slack_id = "{slack_id}"')
