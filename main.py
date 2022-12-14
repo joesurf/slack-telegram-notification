@@ -151,7 +151,7 @@ def start(update: Update, context: CallbackContext):
         # reply_markup=markup,
     )
     
-    return CHECKING_CHOICE 
+    return CHECKING_CHOICE
 
 
 def checking_choice(update: Update, context: CallbackContext) -> int:
