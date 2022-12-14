@@ -274,7 +274,7 @@ from slack_bolt.adapter.flask import SlackRequestHandler
 
 flask_app = Flask(__name__)
 handler = SlackRequestHandler(app)
-
+main()
 
 @flask_app.route("/slack/events", methods=["POST"])
 def slack_events():
