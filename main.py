@@ -1,34 +1,48 @@
-from slack_bolt import App
-import requests
-
+# Run slack and telegram bots
 import os
-from dotenv import load_dotenv
+import logging
+import requests
 from pathlib import Path
-
 from pprint import pprint
+from dotenv import load_dotenv
 
-
-env_path = Path('.') / '.env'
-load_dotenv(dotenv_path=env_path)
-
+from slack_bolt import App
+from telegram.ext.updater import Updater
+from telegram.update import Update
+from telegram.ext.callbackcontext import CallbackContext
+from telegram.ext.commandhandler import CommandHandler
+from telegram.ext.messagehandler import MessageHandler
+from telegram.ext.filters import Filters
+from telegram.ext import (
+    CommandHandler,
+    ConversationHandler,
+    MessageHandler,
+    filters,
+)
+from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove
 
 from database import create_db_connection
 
- 
 
-host = "teleslack.coagzneiihqd.us-east-1.rds.amazonaws.com"
+
+# Initialising credentials 
+env_path = Path('.') / '.env'
+load_dotenv(dotenv_path=env_path)
+
+host = os.environ.get("DB_HOST")
 user = "admin"
 password = os.environ.get("DB_PASS") 
 database = "teleslack"
 
 
-
-# Initializes your app with your bot token and signing secret
+# Initializes Slack app with your bot token and signing secret
 app = App(
     token=os.environ.get("SLACK_BOT_TOKEN"),
     signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
 )
 
+
+# Slack functions
 
 def is_subscribed(slack_id):
     """
@@ -54,8 +68,6 @@ def is_subscribed(slack_id):
         return None
 
 
-
-
 # Detect any message sent to user
 @app.message("")
 def detect_messages(message, ack, say, client):
@@ -65,13 +77,9 @@ def detect_messages(message, ack, say, client):
     """
 
     ack()
-
     print("Detecting messages...")
 
-
-
     sender = client.users_profile_get(user=message["user"])["profile"]["display_name"]
-
     channel = message["channel"]
 
     msg = message["text"]
@@ -95,10 +103,7 @@ def detect_messages(message, ack, say, client):
     send_telegram({"content": content, "subscribers": tele_subscribers})
 
 
-
-
 # Triggered by message detector to send tele
-# @app.action()
 def send_telegram(payload):
     """
     Upon trigger by detect message
@@ -125,41 +130,7 @@ def send_telegram(payload):
     print("Sent successfully!")
     
 
-
-from database import create_db_connection
-from telegram.ext.updater import Updater
-from telegram.update import Update
-from telegram.ext.callbackcontext import CallbackContext
-from telegram.ext.commandhandler import CommandHandler
-from telegram.ext.messagehandler import MessageHandler
-from telegram.ext.filters import Filters
-
-from telegram.ext import (
-    CommandHandler,
-    ConversationHandler,
-    MessageHandler,
-    filters,
-)
-from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove
-
-
-from pprint import pprint
-
-import logging
-import os
-from dotenv import load_dotenv
-from pathlib import Path
-
-
-env_path = Path('.') / '.env'
-load_dotenv(dotenv_path=env_path)
-
-
-host = "teleslack.coagzneiihqd.us-east-1.rds.amazonaws.com"
-user = "admin"
-password = os.environ.get("DB_PASS")
-database = "teleslack"
-
+# Telegram functions
 
 # Enable logging
 logging.basicConfig(
@@ -253,7 +224,9 @@ def unknown(update: Update, context: CallbackContext):
 
 
 def main() -> None:
-    """Run the bot."""
+    """
+    Run the telegram bot.
+    """
     # Create the Application and pass it your bot's token.
     updater = Updater(
         os.environ.get("TELEGRAM_BOT_TOKEN"),
@@ -282,7 +255,6 @@ def main() -> None:
 
     # Filters out unknown commands
     updater.dispatcher.add_handler(MessageHandler(Filters.command, unknown))
-
     # Filters out unknown messages.
     updater.dispatcher.add_handler(MessageHandler(Filters.text, unknown_text))
 
@@ -290,16 +262,13 @@ def main() -> None:
     updater.start_polling()
 
 
-
-
-
-
+# For local testing
 # Start your app
 # if __name__ == "__main__":
 #     app.start(port=int(os.environ.get("PORT", 5002)))
 
 
-
+# Deploy Flask app with Slack connection
 from flask import Flask, request
 from slack_bolt.adapter.flask import SlackRequestHandler
 
