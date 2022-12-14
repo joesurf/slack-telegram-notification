@@ -148,7 +148,7 @@ def start(update: Update, context: CallbackContext):
     """
     update.message.reply_text(
         "Welcome to The 100 Club Bot! Please type your email to verify your membership to The100Club.",
-        # reply_markup=markup,
+        # reply_markup=markup, 
     )
     
     return CHECKING_CHOICE
