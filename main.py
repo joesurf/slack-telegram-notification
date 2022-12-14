@@ -99,7 +99,7 @@ def detect_messages(message, ack, say, client):
     for user in users: # note user is slack_id
         print(user)
         chat_id = is_subscribed(user)
-        if chat_id is not None and sender_id != chat_id:
+        if chat_id is not None and sender_id != user:
             tele_subscribers.append(chat_id)
         
     send_telegram({"content": content, "subscribers": tele_subscribers})
