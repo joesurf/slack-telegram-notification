@@ -131,7 +131,6 @@ def send_telegram(payload):
     print("Sent successfully!")
     
 
-
 # Telegram functions
 
 # Enable logging
