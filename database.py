@@ -5,7 +5,7 @@ def create_db_connection(host_name, user_name, user_password, db_name):
     connection = None
     try:
         connection = pymysql.connect(
-            user=user_name, password=user_password, database=db_name, unix_socket="/tmp/mysql.sock")# host=host_name, 
+            host=host_name, user=user_name, password=user_password, database=db_name) 
         print("MySQL Database connection successful")
     except pymysql.Error as e:
         print(f"Error: '{e}'")
