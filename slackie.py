@@ -18,7 +18,7 @@ from database import create_db_connection
 
 host = "localhost"
 user = "dbadmin"
-password = os.environ["DB_PASS"]
+password = os.environ.get("DB_PASS")
 database = "teleslack"
 
 
@@ -111,7 +111,7 @@ def send_telegram(payload):
     content = payload["content"]
     subscribers = payload["subscribers"]
 
-    token = os.environ["TELEGRAM_BOT_TOKEN"]
+    token = os.environ.get("TELEGRAM_BOT_TOKEN")
     method = "sendMessage"
 
     for subscriber in subscribers:
@@ -127,19 +127,19 @@ def send_telegram(payload):
 
 
 
-# # Start your app
-# if __name__ == "__main__":
-#     app.start(port=int(os.environ.get("PORT", 5002)))
+# Start your app
+if __name__ == "__main__":
+    app.start(port=int(os.environ.get("PORT", 5002)))
 
 
 
-from flask import Flask, request
-from slack_bolt.adapter.flask import SlackRequestHandler
+# from flask import Flask, request
+# from slack_bolt.adapter.flask import SlackRequestHandler
 
-flask_app = Flask(__name__)
-handler = SlackRequestHandler(app)
+# flask_app = Flask(__name__)
+# handler = SlackRequestHandler(app)
 
 
-@flask_app.route("/slack/events", methods=["POST"])
-def slack_events():
-    return handler.handle(request)
+# @flask_app.route("/slack/events", methods=["POST"])
+# def slack_events():
+#     return handler.handle(request)
