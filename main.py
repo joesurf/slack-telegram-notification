@@ -88,7 +88,7 @@ def detect_messages(message, ack, say, client):
     content = f"""
         You have a message from {sender} in Slack! {emoji.emojize('📬')}\
         \n\nhttps://slack.com/app_redirect?channel={channel}
-    """ 
+    """
 
 
     users = client.conversations_members(channel=channel)["members"]
