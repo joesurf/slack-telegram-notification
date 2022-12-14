@@ -5,6 +5,7 @@ import requests
 from pathlib import Path
 from pprint import pprint
 from dotenv import load_dotenv
+import emoji
 
 from slack_bolt import App
 from telegram.ext.updater import Updater
@@ -79,12 +80,13 @@ def detect_messages(message, ack, say, client):
     ack()
     print("Detecting messages...")
 
-    sender = client.users_profile_get(user=message["user"])["profile"]["display_name"]
+    sender_id = message["user"]
+    sender = client.users_profile_get(user=sender_id)["profile"]["display_name"]
     channel = message["channel"]
 
     msg = message["text"]
     content = f"""
-        You have a message from {sender} in Slack! \
+        You have a message from {sender} in Slack! {emoji.emojize(':mailbox_with_mail')}
         \n{msg[:20]}...\
         \n\nhttps://slack.com/app_redirect?channel={channel}"""
 
@@ -97,7 +99,7 @@ def detect_messages(message, ack, say, client):
     for user in users: # note user is slack_id
         print(user)
         chat_id = is_subscribed(user)
-        if chat_id is not None and sender != chat_id:
+        if chat_id is not None and sender_id != chat_id:
             tele_subscribers.append(chat_id)
         
     send_telegram({"content": content, "subscribers": tele_subscribers})
