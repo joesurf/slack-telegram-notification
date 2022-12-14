@@ -251,6 +251,7 @@ def main() -> None:
     )
 
     updater.dispatcher.add_handler(conv_handler)
+    updater.dispatcher.add_handler(CommandHandler('start', start))
     updater.dispatcher.add_handler(CommandHandler('help', help))
 
     # Filters out unknown commands
