@@ -16,8 +16,8 @@ from database import create_db_connection
 
 
 
-host = "localhost"
-user = "root"
+host = "teleslack.coagzneiihqd.us-east-1.rds.amazonaws.com"
+user = "admin"
 password = os.environ.get("DB_PASS") 
 database = "teleslack"
 
