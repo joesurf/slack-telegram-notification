@@ -17,7 +17,7 @@ from database import create_db_connection
 
 
 host = "127.0.0.1"
-user = "dbadmin"
+user = "root"
 password = os.environ.get("DB_PASS") 
 database = "teleslack"
 
