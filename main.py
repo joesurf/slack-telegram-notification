@@ -16,7 +16,7 @@ from database import create_db_connection
 
 
 
-host = "localhost"
+host = "https://tele-slack-bot.herokuapp.com/"
 user = "dbadmin"
 password = os.environ.get("DB_PASS") 
 database = "teleslack"
