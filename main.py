@@ -267,6 +267,7 @@ def main() -> None:
 # For local testing
 # Start your app
 # if __name__ == "__main__":
+#     main()
 #     app.start(port=int(os.environ.get("PORT", 5002)))
 
 
@@ -276,8 +277,7 @@ from slack_bolt.adapter.flask import SlackRequestHandler
 
 flask_app = Flask(__name__)
 handler = SlackRequestHandler(app)
-# main()
-# flask_app.run()
+main()
 
 @flask_app.route("/slack/events", methods=["POST"])
 def slack_events():
