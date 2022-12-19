@@ -91,7 +91,7 @@ def detect_messages(message, ack, say, client):
         \n\nhttps://slack.com/app_redirect?channel={channel}
     """
 
-    users = client.conversations_members(channel=channel)["members"] 
+    users = client.conversations_members(channel=channel)["members"]
     print(users)
 
     tele_subscribers = []
@@ -278,7 +278,7 @@ from slack_bolt.adapter.flask import SlackRequestHandler
 
 flask_app = Flask(__name__)
 handler = SlackRequestHandler(app)
-main()
+# main()
 
 @flask_app.route("/slack/events", methods=["POST"])
 def slack_events():
