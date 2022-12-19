@@ -80,6 +80,7 @@ def detect_messages(message, ack, say, client):
     ack()
     print("Detecting messages...")
 
+    ts = message["ts"]
     sender_id = message["user"]
     sender = client.users_profile_get(user=sender_id)["profile"]["display_name"]
     channel = message["channel"]
@@ -102,7 +103,7 @@ def detect_messages(message, ack, say, client):
         if chat_id is not None and sender_id != user:
             tele_subscribers.append(chat_id)
         
-    send_telegram({"content": content, "subscribers": tele_subscribers})
+    send_telegram({"content": content, "subscribers": tele_subscribers, "timestamp": ts})
 
 
 # Triggered by message detector to send tele
@@ -115,21 +116,24 @@ def send_telegram(payload):
     :message_content -> string
     """
 
+    timestamp = int(float(payload["timestamp"]))
     content = payload["content"]
     subscribers = payload["subscribers"]
-
-    print(payload)
 
     token = os.environ.get("TELEGRAM_BOT_TOKEN")
     method = "sendMessage"
 
+    # ninepm = (timestamp // 86400 + (86400 * 21 / 24)) 
 
-    # current timestamp divided by 86400 day seconds
+    # if (timestamp < ninepm):
+    #     scheduled_timestamp = ninepm
+    # else:
+    #     scheduled_timestamp = ninepm + 86400
 
     for subscriber in subscribers:
         response = requests.post(
             url=f"https://api.telegram.org/bot{token}/{method}",
-            data={'chat_id': subscriber, 'text': content} #, "schedule_date": }
+            data={'chat_id': subscriber, 'text': content} #, "schedule_date": timestamp}
         ).json()
 
         print(response)
