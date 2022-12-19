@@ -88,7 +88,7 @@ def detect_messages(message, ack, say, client):
     content = f"""
         You have a message from {sender} in Slack! {emoji.emojize('📬')}\
         \n\n{msg}
-        \n\nhttps://slack.com/app_redirect?channel={channel}
+        \nhttps://slack.com/app_redirect?channel={channel}
     """
 
     users = client.conversations_members(channel=channel)["members"]
@@ -118,13 +118,18 @@ def send_telegram(payload):
     content = payload["content"]
     subscribers = payload["subscribers"]
 
+    print(payload)
+
     token = os.environ.get("TELEGRAM_BOT_TOKEN")
     method = "sendMessage"
+
+
+    # current timestamp divided by 86400 day seconds
 
     for subscriber in subscribers:
         response = requests.post(
             url=f"https://api.telegram.org/bot{token}/{method}",
-            data={'chat_id': subscriber, 'text': content}
+            data={'chat_id': subscriber, 'text': content} #, "schedule_date": }
         ).json()
 
         print(response)
@@ -278,7 +283,7 @@ from slack_bolt.adapter.flask import SlackRequestHandler
 
 flask_app = Flask(__name__)
 handler = SlackRequestHandler(app)
-main()
+# main()
 
 @flask_app.route("/slack/events", methods=["POST"])
 def slack_events():
