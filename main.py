@@ -91,7 +91,7 @@ def detect_messages(message, ack, say, client):
         \n\nhttps://slack.com/app_redirect?channel={channel}
     """
 
-    users = client.conversations_members(channel=channel)["members"]
+    users = client.conversations_members(channel=channel)["members"] 
     print(users)
 
     tele_subscribers = []
