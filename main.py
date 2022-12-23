@@ -88,8 +88,7 @@ def detect_messages(message, ack, say, client):
     msg = message["text"]
     content = f"""
         You have a message from {sender} in Slack! {emoji.emojize('📬')}\
-        \n\n{msg}
-        \nhttps://slack.com/app_redirect?channel={channel}
+        \n\nhttps://slack.com/app_redirect?channel={channel}
     """
 
     users = client.conversations_members(channel=channel)["members"]
@@ -102,8 +101,34 @@ def detect_messages(message, ack, say, client):
         chat_id = is_subscribed(user)
         if chat_id is not None and sender_id != user:
             tele_subscribers.append(chat_id)
-        
-    send_telegram({"content": content, "subscribers": tele_subscribers, "timestamp": ts})
+
+    # *********************************
+
+    # Check if user in reminder database, else add it
+
+    connection = create_db_connection(host, user, password, database)
+    cursor = connection.cursor()
+
+    for subscriber in tele_subscribers:
+        # Compare with tele-subscribers to check for users who are not present
+        cursor.execute(f'SELECT chat_id FROM Profile WHERE slack_id = "{subscriber}"')
+        response = cursor.fetchone()
+
+        if response is not None:
+            chat_id = response[0]
+            response = cursor.execute(f'SELECT * FROM Reminder WHERE chat_id = "{chat_id}"')
+
+            if response is None:
+                # Add missing users to reminder database
+                cursor.execute(f'INSERT INTO Reminder (chat_id, reminder) VALUES ("{chat_id}", "{content}")')
+
+    # send telegram messages at 9pm daily
+
+    # remove from database
+
+
+    # SEND THIS BY SCHEDULE + CHANGE TO PREVIEW MESSAGE
+    # send_telegram({"content": content, "subscribers": tele_subscribers, "timestamp": ts})
 
 
 # Triggered by message detector to send tele
