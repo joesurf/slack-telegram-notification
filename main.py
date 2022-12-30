@@ -1,3 +1,5 @@
+
+
 # Run slack and telegram bots
 import os
 import logging
@@ -48,9 +50,7 @@ app = App(
 def is_subscribed(slack_id):
     """
     Check database to see if user is subscribed
-
     :user
-
     return telegram chat id
     """
 
@@ -88,6 +88,7 @@ def detect_messages(message, ack, say, client):
     content = f"""
         You have a message from {sender} in Slack! {emoji.emojize('📬')}\
         \n\n{msg}
+        \n\nhttps://slack.com/app_redirect?channel={channel}
     """
 
     users = client.conversations_members(channel=channel)["members"]
@@ -109,7 +110,6 @@ def send_telegram(payload):
     """
     Upon trigger by detect message
     Send content of message to all identified users
-
     :subscribed_users -> list
     :message_content -> string
     """
@@ -144,7 +144,6 @@ DONE, CHECKING_CHOICE, WRONG_CHOICE = range(3)
 
 def start(update: Update, context: CallbackContext):
     """
-
     """
     update.message.reply_text(
         "Welcome to The 100 Club Bot! Please type your email to verify your membership to The100Club.",
@@ -156,7 +155,6 @@ def start(update: Update, context: CallbackContext):
 
 def checking_choice(update: Update, context: CallbackContext) -> int:
     """
-
     """
     # Get identifier from user
 
@@ -226,7 +224,7 @@ def unknown(update: Update, context: CallbackContext):
 
 def main() -> None:
     """
-    Run the telegram bot. 
+    Run the telegram bot.
     """
     # Create the Application and pass it your bot's token.
     updater = Updater(
