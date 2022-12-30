@@ -20,10 +20,8 @@ from telegram.ext import (
     MessageHandler,
     filters,
 )
-from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove
 
 from database import create_db_connection
-
 
 
 # Initialising credentials 
@@ -99,28 +97,41 @@ def detect_messages(message, ack, say, client):
     for user in users: # note user is slack_id
         print(user)
         chat_id = is_subscribed(user)
-        if chat_id is not None and sender_id != user:
+        if chat_id is not None: #and sender_id != user:
             tele_subscribers.append(chat_id)
 
     # *********************************
 
     # Check if user in reminder database, else add it
 
+    host = os.environ.get("DB_HOST")
+    user = "admin"
+    password = os.environ.get("DB_PASS") 
+    database = "teleslack"
+
+    print("hi")
+
     connection = create_db_connection(host, user, password, database)
     cursor = connection.cursor()
 
     for subscriber in tele_subscribers:
         # Compare with tele-subscribers to check for users who are not present
-        cursor.execute(f'SELECT chat_id FROM Profile WHERE slack_id = "{subscriber}"')
-        response = cursor.fetchone()
+        # cursor.execute(f'SELECT chat_id FROM Profile WHERE slack_id = "{subscriber}"')
+        # response = cursor.fetchone()
+        # print("checking...")
+        # print(response)
 
-        if response is not None:
-            chat_id = response[0]
-            response = cursor.execute(f'SELECT * FROM Reminder WHERE chat_id = "{chat_id}"')
+        response = cursor.execute(f'SELECT * FROM Reminder WHERE chat_id = "{subscriber}"')
+        print("Not in...")
+        print(response)
 
-            if response is None:
-                # Add missing users to reminder database
-                cursor.execute(f'INSERT INTO Reminder (chat_id, reminder) VALUES ("{chat_id}", "{content}")')
+        if response == 0:
+            # Add missing users to reminder database
+            cursor.execute(f'INSERT INTO Reminder (chat_id, remind) VALUES ("{subscriber}", "{content}")')
+            print("Adding...")
+
+    connection.commit()
+    connection.close()
 
     # send telegram messages at 9pm daily
 
@@ -301,19 +312,19 @@ def main() -> None:
 
 # For local testing
 # Start your app
-# if __name__ == "__main__":
-#     main()
-#     app.start(port=int(os.environ.get("PORT", 5002)))
+if __name__ == "__main__":
+    main()
+    app.start(port=5002)
 
 
 # Deploy Flask app with Slack connection
-from flask import Flask, request
-from slack_bolt.adapter.flask import SlackRequestHandler
+# from flask import Flask, request
+# from slack_bolt.adapter.flask import SlackRequestHandler
 
-flask_app = Flask(__name__)
-handler = SlackRequestHandler(app)
-# main()
+# flask_app = Flask(__name__)
+# handler = SlackRequestHandler(app)
+# # main()
 
-@flask_app.route("/slack/events", methods=["POST"])
-def slack_events():
-    return handler.handle(request) 
+# @flask_app.route("/slack/events", methods=["POST"])
+# def slack_events():
+#     return handler.handle(request) 
