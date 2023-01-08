@@ -126,13 +126,18 @@ def send_telegram(payload):
     cursor = connection.cursor()
 
     for subscriber in subscribers:
+        tele_message = content
         cursor.execute(f'SELECT group_type FROM Profile WHERE chat_id = "{subscriber}"')
-        if cursor.fetchone()[0] == "test":
-            content += f"\n\n{msg}"
+        group_type = cursor.fetchone()[0]
+        
+        print(group_type)
+
+        if group_type == "test":
+            tele_message += f"\n{msg}"
 
         response = requests.post(
             url=f"https://api.telegram.org/bot{token}/{method}",
-            data={'chat_id': subscriber, 'text': content}
+            data={'chat_id': subscriber, 'text': tele_message}
         ).json()
 
         print(response)
@@ -297,7 +302,7 @@ from slack_bolt.adapter.flask import SlackRequestHandler
 
 flask_app = Flask(__name__)
 handler = SlackRequestHandler(app)
-# main()
+main()
 
 @flask_app.route("/slack/events", methods=["POST"])
 def slack_events():
