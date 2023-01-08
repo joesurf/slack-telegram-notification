@@ -191,8 +191,11 @@ def checking_choice(update: Update, context: CallbackContext) -> int:
                 f'UPDATE Profile SET chat_id="{chat_id}" WHERE identifier = "{identifier}"')
 
             # Add alternate fields for A/B testing - if not empty add next number
+            cursor.execute(
+                f'SELECT COUNT(group_type) FROM Profile WHERE group_type IS NOT NULL')
+            counter = cursor.fetchone()[0]
+
             group_type = "control" if counter % 2 == 1 else "test"
-            counter += 1
 
             cursor.execute(f'SELECT group_type FROM Profile WHERE identifier = "{identifier}"')
 
@@ -303,7 +306,7 @@ from slack_bolt.adapter.flask import SlackRequestHandler
 
 flask_app = Flask(__name__)
 handler = SlackRequestHandler(app)
-main()
+#main()
 
 @flask_app.route("/slack/events", methods=["POST"])
 def slack_events():
