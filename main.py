@@ -89,8 +89,7 @@ def detect_messages(message, ack, say, client):
     msg = message["text"]
     content = f"""
         You have a message from {sender} in Slack! {emoji.emojize('📬')}\
-        \n\n{msg}
-        \n\nhttps://slack.com/app_redirect?channel={channel}
+        \nhttps://slack.com/app_redirect?channel={channel}
     """
 
     users = client.conversations_members(channel=channel)["members"]
@@ -104,7 +103,7 @@ def detect_messages(message, ack, say, client):
         if chat_id is not None and sender_id != user:
             tele_subscribers.append(chat_id)
         
-    send_telegram({"content": content, "subscribers": tele_subscribers})
+    send_telegram({"content": content, "subscribers": tele_subscribers, "message": msg})
 
 
 # Triggered by message detector to send tele
@@ -118,11 +117,19 @@ def send_telegram(payload):
 
     content = payload["content"]
     subscribers = payload["subscribers"]
+    msg = payload["message"]
 
     token = os.environ.get("TELEGRAM_BOT_TOKEN")
     method = "sendMessage"
 
+    connection = create_db_connection(host, user, password, database)
+    cursor = connection.cursor()
+
     for subscriber in subscribers:
+        cursor.execute(f'SELECT group_type FROM Profile WHERE chat_id = "{subscriber}"')
+        if cursor.fetchone()[0] == "test":
+            content += f"/n/n{msg}"
+
         response = requests.post(
             url=f"https://api.telegram.org/bot{token}/{method}",
             data={'chat_id': subscriber, 'text': content}
