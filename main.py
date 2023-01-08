@@ -182,6 +182,8 @@ def checking_choice(update: Update, context: CallbackContext) -> int:
     connection = create_db_connection(host, user, password, database)
     cursor = connection.cursor()
     cursor.execute(f'SELECT * FROM Profile WHERE identifier = "{identifier}"')
+    print(identifier)
+    print(cursor.fetchone())
 
     if cursor.fetchone():
         try:
@@ -302,7 +304,7 @@ from slack_bolt.adapter.flask import SlackRequestHandler
 
 flask_app = Flask(__name__)
 handler = SlackRequestHandler(app)
-main()
+# main()
 
 @flask_app.route("/slack/events", methods=["POST"])
 def slack_events():
