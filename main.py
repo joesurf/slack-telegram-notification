@@ -37,6 +37,8 @@ user = "admin"
 password = os.environ.get("DB_PASS") 
 database = "teleslack"
 
+counter = 0
+
 
 # Initializes Slack app with your bot token and signing secret
 app = App(
@@ -171,8 +173,21 @@ def checking_choice(update: Update, context: CallbackContext) -> int:
 
     if cursor.fetchone():
         try:
+
+            # Add telegram chat id to database
             cursor.execute(
                 f'UPDATE Profile SET chat_id="{chat_id}" WHERE identifier = "{identifier}"')
+
+            # Add alternate fields for A/B testing - if not empty add next number
+            group_type = "control" if counter % 2 == 1 else "test"
+            counter += 1
+
+            cursor.execute(f'SELECT group_type FROM Profile WHERE identifier = "{identifier}"')
+
+            if cursor.fetchone():
+                cursor.execute(
+                    f'UPDATE Profile SET group="{group_type}" WHERE identifier = "{identifier}"')
+
             connection.commit()
             connection.close()
 
@@ -275,7 +290,7 @@ from slack_bolt.adapter.flask import SlackRequestHandler
 
 flask_app = Flask(__name__)
 handler = SlackRequestHandler(app)
-main()
+# main()
 
 @flask_app.route("/slack/events", methods=["POST"])
 def slack_events():
