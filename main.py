@@ -182,7 +182,6 @@ def checking_choice(update: Update, context: CallbackContext) -> int:
     connection = create_db_connection(host, user, password, database)
     cursor = connection.cursor()
     cursor.execute(f'SELECT identifier FROM Profile WHERE identifier = "{identifier}"')
-    print(identifier)
 
     if cursor.fetchone():
         try:
@@ -208,6 +207,7 @@ def checking_choice(update: Update, context: CallbackContext) -> int:
                 "You are now subscribed to our Slack notifications. :D",
             )
         except Exception as e:
+            print(e)
             update.message.reply_text(
                 "Oh no, there's a huge problem here. Please contact @joesurfrk for assistance.",
             )
@@ -303,7 +303,7 @@ from slack_bolt.adapter.flask import SlackRequestHandler
 
 flask_app = Flask(__name__)
 handler = SlackRequestHandler(app)
-main()
+# main()
 
 @flask_app.route("/slack/events", methods=["POST"])
 def slack_events():
