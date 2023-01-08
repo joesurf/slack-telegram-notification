@@ -201,7 +201,7 @@ def checking_choice(update: Update, context: CallbackContext) -> int:
 
             if cursor.fetchone():
                 cursor.execute(
-                    f'UPDATE Profile SET group="{group_type}" WHERE identifier = "{identifier}"')
+                    f'UPDATE Profile SET group_type="{group_type}" WHERE identifier = "{identifier}"')
 
             connection.commit()
             connection.close()
@@ -306,7 +306,7 @@ from slack_bolt.adapter.flask import SlackRequestHandler
 
 flask_app = Flask(__name__)
 handler = SlackRequestHandler(app)
-main()
+#main()
 
 @flask_app.route("/slack/events", methods=["POST"])
 def slack_events():
