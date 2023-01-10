@@ -178,8 +178,14 @@ def leave(update: Update, context: CallbackContext):
 
     cursor.execute(f'SELECT chat_id FROM Profile WHERE chat_id = "{chat_id}"')
 
+    print("checking status")
+
     if cursor.fetchone():
+        print("unsubscribe")
         cursor.execute(f'UPDATE Profile SET chat_id = "Unsubscribed" WHERE chat_id = "{chat_id}"')
+
+    connection.commit()
+    connection.close()
 
     update.message.reply_text(
         "We're sorry to see you leave. Please let us know how we can serve you better.",
@@ -329,7 +335,7 @@ from slack_bolt.adapter.flask import SlackRequestHandler
 
 flask_app = Flask(__name__)
 handler = SlackRequestHandler(app)
-#main() 
+main() 
 
 @flask_app.route("/slack/events", methods=["POST"])
 def slack_events():
