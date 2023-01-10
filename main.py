@@ -145,6 +145,14 @@ def send_telegram(payload):
     print("Sent successfully!")
     
 
+def sendSlackNotification(email, status):
+    app.client.chat_postMessage(channel="C03NP6E3DDG", text=f"{email} just {status} to teleslack bot! Hooya")
+    print("Successfully notified")
+    return
+
+
+
+
 # Telegram functions
 
 # Enable logging
@@ -176,9 +184,13 @@ def leave(update: Update, context: CallbackContext):
     connection = create_db_connection(host, user, password, database)
     cursor = connection.cursor()
 
+    cursor.execute(f'SELECT identifier FROM Profile WHERE chat_id = "{chat_id}"')
+    identifier = cursor.fetchone()[0]
+
     cursor.execute(f'SELECT chat_id FROM Profile WHERE chat_id = "{chat_id}"')
 
     print("checking status")
+
 
     if cursor.fetchone():
         print("unsubscribe")
@@ -191,6 +203,9 @@ def leave(update: Update, context: CallbackContext):
         "We're sorry to see you leave. Please let us know how we can serve you better.",
         # reply_markup=markup, 
     )
+    
+    # Inform team
+    sendSlackNotification(identifier, "unsubscribed")
     
     return ConversationHandler.END
 
@@ -237,6 +252,10 @@ def checking_choice(update: Update, context: CallbackContext) -> int:
             update.message.reply_text(
                 "You are now subscribed to our Slack notifications. :D",
             )
+
+            # Inform team
+            sendSlackNotification(identifier, "subscribed")
+
         except Exception as e:
             print(e)
             update.message.reply_text(
@@ -335,7 +354,7 @@ from slack_bolt.adapter.flask import SlackRequestHandler
 
 flask_app = Flask(__name__)
 handler = SlackRequestHandler(app)
-main() 
+#main() 
 
 @flask_app.route("/slack/events", methods=["POST"])
 def slack_events():
