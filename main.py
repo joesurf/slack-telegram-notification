@@ -65,7 +65,7 @@ def is_subscribed(slack_id):
     connection.commit()
     connection.close()
 
-    if response is not None:
+    if response is not None and response[0] != "Unsubscribed":
         return response[0]
     else:
         return None
@@ -153,7 +153,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-DONE, CHECKING_CHOICE, WRONG_CHOICE = range(3)
+DONE, CHECKING_CHOICE, LEAVE = range(3)
 
 
 def start(update: Update, context: CallbackContext):
@@ -165,6 +165,28 @@ def start(update: Update, context: CallbackContext):
     )
     
     return CHECKING_CHOICE
+
+
+def leave(update: Update, context: CallbackContext):
+    """
+    """
+    # Remove chat_id and replace with ex- to indicate
+    chat_id = update.message.chat_id
+
+    connection = create_db_connection(host, user, password, database)
+    cursor = connection.cursor()
+
+    cursor.execute(f'SELECT chat_id FROM Profile WHERE chat_id = "{chat_id}"')
+
+    if cursor.fetchone():
+        cursor.execute(f'UPDATE Profile SET chat_id = "Unsubscribed" WHERE chat_id = "{chat_id}"')
+
+    update.message.reply_text(
+        "We're sorry to see you leave. Please let us know how we can serve you better.",
+        # reply_markup=markup, 
+    )
+    
+    return ConversationHandler.END
 
 
 def checking_choice(update: Update, context: CallbackContext) -> int:
@@ -283,6 +305,7 @@ def main() -> None:
     updater.dispatcher.add_handler(conv_handler)
     updater.dispatcher.add_handler(CommandHandler('start', start))
     updater.dispatcher.add_handler(CommandHandler('help', help))
+    updater.dispatcher.add_handler(CommandHandler('leave', leave))
 
     # Filters out unknown commands
     updater.dispatcher.add_handler(MessageHandler(Filters.command, unknown))
